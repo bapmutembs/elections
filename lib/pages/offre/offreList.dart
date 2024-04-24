@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:elec/pages/offre/offreList.dart';
 
 class OffrePage extends StatelessWidget {
   @override

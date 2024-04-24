@@ -1,4 +1,4 @@
-import 'package:elections/presence/presence.dart';
+import 'package:elections/pages/presence/presence.dart';
 
 class ListPresenceCtrl {
 

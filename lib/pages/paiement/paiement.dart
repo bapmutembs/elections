@@ -1,4 +1,4 @@
-import 'package:elections/paiement/listpaiement.dart';
+import 'package:elections/pages/paiement/listpaiement.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

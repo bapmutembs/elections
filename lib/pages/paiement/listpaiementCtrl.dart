@@ -1,4 +1,4 @@
-import 'package:elections/paiement/paiementAgent.dart';
+import 'package:elections/pages/paiement/paiementAgent.dart';
 
 class ListPaiementCtrl {
 

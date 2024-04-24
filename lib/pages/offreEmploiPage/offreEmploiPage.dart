@@ -1,7 +1,6 @@
+import 'package:elections/pages/intro/introPage.dart';
+import 'package:elections/pages/offre/offreList.dart';
 import 'package:flutter/material.dart';
-
-import '../introPage/introPage.dart';
-import '../offre/offreList.dart';
 
 var DateFormat;
 //var formatterDate;
