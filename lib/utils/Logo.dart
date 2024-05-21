@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Logo {
-  var path = "images/logo/logo.png";
+  var path = "assets/images/logo/logo.png";
 
   Container logo(double? width, double? height) {
     return Container(

@@ -1,14 +1,16 @@
-import 'package:elections/pages/CandidatEnregistrer/CandidatEnregistrerPage.dart';
-import 'package:elections/pages/CandidatList/CandidatListPage.dart';
-import 'package:elections/pages/DepartementEnregistrer/DepartementEnregistrerPage.dart';
-import 'package:elections/pages/DepartementList/DepartementListPage.dart';
-import 'package:elections/pages/Login/LoginPage.dart';
-import 'package:elections/pages/MissionEnregistrer/MissionEnregistrerPage.dart';
-import 'package:elections/pages/MissionList/MissionListPage.dart';
+import 'package:elections/candidat/ui/pages/CandidatEnregistrer/CandidatEnregistrerPage.dart';
+import 'package:elections/candidat/ui/pages/CandidatList/CandidatListPage.dart';
+import 'package:elections/departement/ui/pages/DepartementEnregistrer/DepartementEnregistrerPage.dart';
+import 'package:elections/departement/ui/pages/DepartementList/DepartementListPage.dart';
+import 'package:elections/user/ui/pages/Login/LoginPage.dart';
+import 'package:elections/mission/ui/pages/MissionEnregistrer/MissionEnregistrerPage.dart';
+import 'package:elections/mission/ui/pages/MissionList/MissionListPage.dart';
 import 'package:elections/utils/Colors.dart';
 import 'package:elections/utils/Logo.dart';
 import 'package:elections/widgets/mainMenu.dart';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class IntroPage extends StatelessWidget {
   @override
@@ -27,10 +29,7 @@ class IntroPage extends StatelessWidget {
           ),
           Text(
             "Gestion Employe",
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(context).textTheme.displayLarge,
           ),
           Spacer(),
           Container(
@@ -41,11 +40,7 @@ class IntroPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                   elevation: 15, foregroundColor: Colors.black),
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => LoginPage(),
-                  ),
-                );
+                context.pushReplacement('/login');
               },
               label: Text(
                 "Demarrer",
@@ -67,5 +62,4 @@ class IntroPage extends StatelessWidget {
       ),
     );
   }
-
 }

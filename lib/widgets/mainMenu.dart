@@ -1,8 +1,9 @@
-import 'package:elections/pages/CandidatList/CandidatListPage.dart';
-import 'package:elections/pages/DepartementList/DepartementListPage.dart';
+import 'package:elections/candidat/ui/pages/CandidatList/CandidatListPage.dart';
+import 'package:elections/departement/ui/pages/DepartementList/DepartementListPage.dart';
 import 'package:elections/pages/Home/HomePage.dart';
-import 'package:elections/pages/Login/LoginPage.dart';
-import 'package:elections/pages/MissionList/MissionListPage.dart';
+import 'package:elections/user/ui/pages/Login/LoginController.dart';
+import 'package:elections/user/ui/pages/Login/LoginPage.dart';
+import 'package:elections/mission/ui/pages/MissionList/MissionListPage.dart';
 import 'package:elections/pages/intro/introPage.dart';
 import 'package:elections/pages/offre/offreList.dart';
 import 'package:elections/pages/paiement/listpaiement.dart';
@@ -10,10 +11,37 @@ import 'package:elections/pages/presence/listPresence.dart';
 import 'package:elections/pages/prime/pagePrime.dart';
 import 'package:elections/utils/Colors.dart';
 import 'package:elections/utils/Logo.dart';
+import 'package:elections/utils/db.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class mainMenu {
-  Widget mainmenu(BuildContext context) {
+class mainMenu extends ConsumerStatefulWidget {
+  mainMenu(BuildContext context);
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => mainMenuState();
+}
+
+class mainMenuState extends ConsumerState<mainMenu> {
+  String? _token;
+
+  void initState() {
+    super.initState();
+    refresh();
+  }
+
+  Future<void> refresh() async {
+    var ctlr = this.ref.read(loginControllerProvider.notifier);
+    var resp = await ctlr.getTheToken();
+
+    setState(() {
+      _token = resp;
+    });
+  }
+
+  Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
         children: [
@@ -128,18 +156,17 @@ class mainMenu {
             leading: Icon(Icons.money_outlined),
           ),
           Divider(),
-          ListTile(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (ctx) => LoginPage(),
+          (_token == null)
+              ? ListTile()
+              : ListTile(
+                  onTap: () async {
+                    var ctlrr = this.ref.watch(loginControllerProvider.notifier);
+                    ctlrr.disconnect();
+                    context.pushReplacement('/login');
+                  },
+                  title: Text("Deconnexion"),
+                  leading: Icon(Icons.logout),
                 ),
-              );
-            },
-            title: Text("Deconnexion"),
-            leading: Icon(Icons.logout),
-          ),
         ],
       ),
     );
