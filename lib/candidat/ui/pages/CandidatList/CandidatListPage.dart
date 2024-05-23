@@ -1,3 +1,4 @@
+import 'package:elections/candidat/business/interactors/CandidatInteractor.dart';
 import 'package:elections/candidat/business/model/candidat/Candidat.dart';
 import 'package:elections/candidat/ui/pages/CandidatDetail/CandidatDetailPage.dart';
 import 'package:elections/candidat/ui/pages/CandidatList/CandidatListController.dart';
@@ -11,47 +12,38 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shimmer/shimmer.dart';
 
-class CandididatListPage extends StatefulWidget {
-  const CandididatListPage({Key? key}) : super(key: key);
-
+class CandididatListPage extends ConsumerStatefulWidget {
   @override
-  _CandididatListPageState createState() => _CandididatListPageState();
+  ConsumerState<CandididatListPage> createState() => _CandididatListPageState();
 }
 
-class _CandididatListPageState extends State<CandididatListPage> {
-  @override
-  Widget build(BuildContext context) {
-    return PageView(
-      physics: const ClampingScrollPhysics(),
-      children: <Widget>[
-        CardScreen(),
-      ],
-    );
-  }
-}
-
-class CardScreen extends ConsumerStatefulWidget {
-  @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _CardScreenState();
-}
-
-class _CardScreenState extends ConsumerState<CardScreen> {
-  List<Candidat> candidats = <Candidat>[];
-  var state;
+class _CandididatListPageState extends ConsumerState<CandididatListPage> {
+  // void initState() {
+  //   super.initState();
+  //   refresh();
+  // }
 
   void initState() {
     super.initState();
-    refresh();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      var ctrl = this.ref.read(candidatListControllerProvider.notifier);
+      ctrl.getList();
+    });
   }
 
   Future<void> refresh() async {
-    var controller = this.ref.read(candidatListControllerProvider.notifier);
-    state = false;
-    List<Candidat> resp = await controller.getList();
-    state = true;
+    // var controller = this.ref.read(candidatListControllerProvider.notifier);
+    // state = false;
+    // List<Candidat> resp = await controller.getList();
+    // state = true;
 
-    setState(() {
-      candidats = resp;
+    // setState(() {
+    //   candidats = resp;
+    // });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      var ctrl = this.ref.read(candidatListControllerProvider.notifier);
+      ctrl.getList();
     });
   }
 
@@ -59,8 +51,13 @@ class _CardScreenState extends ConsumerState<CardScreen> {
     var controller = this.ref.read(candidatListControllerProvider.notifier);
     var resp = await controller.disableAll();
 
-    setState(() {
-      refresh();
+    // setState(() {
+    //   refresh();
+    // });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      var ctrl = this.ref.read(candidatListControllerProvider.notifier);
+      ctrl.getList();
     });
 
     return resp;
@@ -70,8 +67,13 @@ class _CardScreenState extends ConsumerState<CardScreen> {
     var controller = this.ref.read(candidatListControllerProvider.notifier);
     var resp = await controller.disable(candidat);
 
-    setState(() {
-      refresh();
+    // setState(() {
+    //   refresh();
+    // });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      var ctrl = this.ref.read(candidatListControllerProvider.notifier);
+      ctrl.getList();
     });
 
     return resp;
@@ -79,73 +81,89 @@ class _CardScreenState extends ConsumerState<CardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var state = this.ref.watch(candidatListControllerProvider);
     var nameStyle = Theme.of(context).textTheme;
 
-    return Scaffold(
-      drawer: mainMenu(context),
-      appBar: AppBar(
-        title: Text(
-          'Candidats',
-          style: Theme.of(context).textTheme.displayLarge,
-        ),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              if (await _deleteAll()) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Suppression reussi'),
-                  ),
-                );
+    return PageView(
+      physics: const ClampingScrollPhysics(),
+      children: <Widget>[
+        Scaffold(
+          drawer: mainMenu(context),
+          appBar: AppBar(
+            title: Text(
+              'Candidats',
+              style: Theme.of(context).textTheme.displayLarge,
+            ),
+            actions: [
+              IconButton(
+                onPressed: () async {
+                  if (await _deleteAll()) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Suppression reussi'),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Suppression echoue'),
+                      ),
+                    );
+                  }
+                },
+                icon: Icon(Icons.remove_circle_outline),
+              ),
+              IconButton(
+                onPressed: () => context.go('/candidat/enregistrer'),
+                icon: Icon(Icons.add_circle_outline_sharp),
+              ),
+            ],
+          ),
+          body: RefreshIndicator(
+            onRefresh: refresh,
+            child: Stack(
+              children: [
+                _dataList(state.data, nameStyle, _delete),
+                _shimmer(_refreshBtn(context, ref, refresh), context, this.ref),
+              ],
+            ),
+          ),
+
+          /*FutureBuilder(
+            future: refresh(),
+            builder: (context, snapshot) {
+              if (((state == true) ||
+                      (snapshot.connectionState == ConnectionState.waiting)) &&
+                  (candidats.isEmpty)) {
+                return _shimmer(_refreshBtn(context, ref, refresh));
+              } else if ((state == false) && (candidats.isNotEmpty)) {
+                return _dataList(candidats, nameStyle, _delete);
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Suppression echoue'),
+                return Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          'No Data',
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        _refreshBtn(context, ref, refresh)
+                      ],
+                    ),
                   ),
                 );
               }
-            },
-            icon: Icon(Icons.remove_circle_outline),
-          ),
-          IconButton(
-            onPressed: () => context.go('/candidat/enregistrer'),
-            icon: Icon(Icons.add_circle_outline_sharp),
-          ),
-        ],
-      ),
-      body: FutureBuilder(
-          future: refresh(),
-          builder: (context, snapshot) {
-            if (((state == true) ||
-                    (snapshot.connectionState == ConnectionState.waiting)) &&
-                (candidats.isEmpty)) {
-              return _shimmer(_refreshBtn(context, ref, refresh));
-            } else if ((state == false) && (candidats.isNotEmpty)) {
-              return _dataList(candidats, nameStyle, _delete);
-            } else {
-              return Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        'No Data',
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      _refreshBtn(context, ref, refresh)
-                    ],
-                  ),
-                ),
-              );
-            }
-          }),
+            }), */
+        ),
+      ],
     );
   }
 }
 
-Column _dataList(candidats, nameStyle, delete) {
+Widget _dataList(List<Candidat> candidats, nameStyle, delete) {
   return Column(
     children: [
       Expanded(
@@ -180,9 +198,12 @@ Column _dataList(candidats, nameStyle, delete) {
                     trailing: IconButton(
                       icon: const Icon(Icons.remove_red_eye),
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Page pas encore disponible'),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CandidatDetailPage(
+                              candidat: candidats[index],
+                            ),
                           ),
                         );
                       },
@@ -233,52 +254,57 @@ Column _dataList(candidats, nameStyle, delete) {
   );
 }
 
-ListView _shimmer(refreshBtn) {
-  return ListView(
-    children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20.0),
-        child: Shimmer.fromColors(
-          baseColor: Colors.grey.shade300,
-          highlightColor: Colors.grey.shade100,
-          enabled: true,
-          child: const SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                ContentPlaceholder(
-                  lineType: ContentLineType.twoLines,
-                ),
-                SizedBox(height: 16.0),
-                ContentPlaceholder(
-                  lineType: ContentLineType.twoLines,
-                ),
-                SizedBox(height: 16.0),
-                ContentPlaceholder(
-                  lineType: ContentLineType.twoLines,
-                ),
-              ],
+Widget _shimmer(refreshBtn, BuildContext context, WidgetRef ref) {
+  var state = ref.watch(candidatListControllerProvider);
+  print(state.isLoading);
+  return Visibility(
+    visible: state.isLoading,
+    child: ListView(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20.0),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey.shade300,
+            highlightColor: Colors.grey.shade100,
+            enabled: true,
+            child: const SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  ContentPlaceholder(
+                    lineType: ContentLineType.twoLines,
+                  ),
+                  SizedBox(height: 16.0),
+                  ContentPlaceholder(
+                    lineType: ContentLineType.twoLines,
+                  ),
+                  SizedBox(height: 16.0),
+                  ContentPlaceholder(
+                    lineType: ContentLineType.twoLines,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      Center(
-        child: Column(
-          children: [
-            LoadingAnimationWidget.dotsTriangle(
-              color: Couleurs().primary,
-              size: 40,
-            ),
-            SizedBox(
-              height: 50,
-            ),
-            refreshBtn,
-          ],
-        ),
-      )
-    ],
+        Center(
+          child: Column(
+            children: [
+              LoadingAnimationWidget.dotsTriangle(
+                color: Couleurs().primary,
+                size: 40,
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              refreshBtn,
+            ],
+          ),
+        )
+      ],
+    ),
   );
 }
 
