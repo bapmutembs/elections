@@ -51,7 +51,7 @@ class MyCandidateEnregistrerState
                 width: double.infinity,
                 height: 5,
               ),
-              if (state)
+              if (state.isLoading)
                 LoadingAnimationWidget.twistingDots(
                     leftDotColor: Couleurs().primary,
                     rightDotColor: Couleurs().secondary,

@@ -4,20 +4,28 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part "CandidatEnregistrerController.g.dart";
 
+class CandidatEnregistrerState{
+  // List<Candidat> data = [];
+  bool isLoading = false;
+
+  CandidatEnregistrerState({ this.isLoading = false });
+}
+
 class CandidatEnregistrerController extends _$CandidatEnregistrerController {
-  late CreateCandidatUseCase createCandidatUseCase;
+  // late CreateCandidatUseCase createCandidatUseCase;
 
   @override
-  bool build(){
-    var interactor = ref.watch(candidatInteractorProvider);
-    createCandidatUseCase = interactor.createCandidatUseCase;
-    return false;
+  CandidatEnregistrerState build(){
+    // var interactor = ref.watch(candidatInteractorProvider);
+    // createCandidatUseCase = interactor.createCandidatUseCase;
+    return CandidatEnregistrerState();
   }
 
   Future<bool> submitForm(data) async{
-    state = true;
-    var res = await createCandidatUseCase.run(data);
-    state = false;
+    state = CandidatEnregistrerState(isLoading: true);
+    var interactor = ref.watch(candidatInteractorProvider);
+    var res = await interactor.createCandidatUseCase.run(data);
+    state = CandidatEnregistrerState( isLoading: false);
     print("Candidat enregistrer");
     return res!="";
   }

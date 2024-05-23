@@ -6,21 +6,21 @@ part of 'CandidatEnregistrerController.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$CandidatEnregistrerControllerHash() => r'210227f3ddf837c7081130102f900a02ce0098f8';
+String _$candidatEnregistrerControllerHash() => r'5c40627b15f897d392fd4721d42dd897efa0f860';
 
 /// See also [CandidatEnregistrerController].
 @ProviderFor(CandidatEnregistrerController)
 final candidatEnregistrerControllerProvider =
-    AutoDisposeNotifierProvider<CandidatEnregistrerController, bool>.internal(
+    AutoDisposeNotifierProvider<CandidatEnregistrerController, CandidatEnregistrerState>.internal(
   CandidatEnregistrerController.new,
-  name: r'candidatEnregistrerControllerProvider',
+  name: r'candidatEnregistrerController',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$CandidatEnregistrerControllerHash,
+      : _$candidatEnregistrerControllerHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$CandidatEnregistrerController = AutoDisposeNotifier<bool>;
+typedef _$CandidatEnregistrerController = AutoDisposeNotifier<CandidatEnregistrerState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
